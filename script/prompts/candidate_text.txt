@@ -1,0 +1,1 @@
+Translate all supplied source text into target language {target_lang}. Return one JSON object only, with key candidate_blocks. candidate_blocks must be an array of objects with integer id, string source_text copied exactly from the input, and string text. Do not add commentary.\n\nSource blocks:\n{source_blocks}\n

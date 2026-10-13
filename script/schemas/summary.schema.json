@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vista_public_summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scoring_protocol", "profile", "rubric_set", "cross_track_comparable", "formula", "ranking", "coverage", "leaderboard"],
+  "properties": {
+    "schema_version": {"const": "vista_public_summary"},
+    "scoring_protocol": {"const": "binary_expected_independent_vtk"},
+    "profile": {"enum": ["image", "text"]},
+    "rubric_set": {"enum": ["basic_rubric", "rubric"]},
+    "cross_track_comparable": {"const": false},
+    "formula": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["translation_quality", "image_understanding", "knowledge_entailment"],
+      "properties": {
+        "translation_quality": {"$ref": "#/$defs/dimension_formula"},
+        "image_understanding": {"$ref": "#/$defs/dimension_formula"},
+        "knowledge_entailment": {"$ref": "#/$defs/dimension_formula"}
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimensions", "score_scale", "public_decimals", "rounding", "method", "order", "null_rank", "row_order"],
+      "properties": {
+        "dimensions": {
+          "const": {
+            "translation_quality": "rank_translation",
+            "image_understanding": "rank_image",
+            "knowledge_entailment": "rank_knowledge"
+          }
+        },
+        "score_scale": {"const": 100},
+        "public_decimals": {"const": 6},
+        "rounding": {"const": "ROUND_HALF_UP"},
+        "method": {"const": "competition"},
+        "order": {"const": "descending"},
+        "null_rank": {"type": "null"},
+        "row_order": {"const": ["translation_quality descending", "null last", "model ascending"]}
+      }
+    },
+    "coverage": {"type": "array", "items": {"$ref": "#/$defs/coverage"}},
+    "leaderboard": {"type": "array", "items": {"$ref": "#/$defs/leaderboard_row"}},
+    "selection_leakage": {"const": true},
+    "analysis_status": {"const": "exploratory"},
+    "official_leaderboard": {"const": false}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"rubric_set": {"const": "rubric"}}},
+      "then": {"required": ["selection_leakage", "analysis_status", "official_leaderboard"]},
+      "else": {
+        "not": {"anyOf": [
+          {"required": ["selection_leakage"]},
+          {"required": ["analysis_status"]},
+          {"required": ["official_leaderboard"]}
+        ]}
+      }
+    },
+    {
+      "if": {"properties": {"profile": {"const": "text"}}},
+      "then": {
+        "properties": {
+          "leaderboard": {
+            "items": {
+              "properties": {
+                "image_understanding": {"type": "null"},
+                "rank_image": {"type": "null"},
+                "image_directions": {"const": 0}
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "score": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "rank": {"type": ["integer", "null"], "minimum": 1},
+    "count": {"type": "integer", "minimum": 0},
+    "dimension_formula": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "leaderboard", "direction_level1", "level1"],
+      "properties": {
+        "direction": {"type": "string", "minLength": 1},
+        "leaderboard": {"type": "string", "minLength": 1},
+        "direction_level1": {"type": "string", "minLength": 1},
+        "level1": {"type": "string", "minLength": 1}
+      }
+    },
+    "leaderboard_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "rank_translation", "rank_image", "rank_knowledge", "translation_quality", "image_understanding", "knowledge_entailment", "translation_directions", "image_directions", "knowledge_directions"],
+      "properties": {
+        "model": {"type": "string", "minLength": 1},
+        "rank_translation": {"$ref": "#/$defs/rank"},
+        "rank_image": {"$ref": "#/$defs/rank"},
+        "rank_knowledge": {"$ref": "#/$defs/rank"},
+        "translation_quality": {"$ref": "#/$defs/score"},
+        "image_understanding": {"$ref": "#/$defs/score"},
+        "knowledge_entailment": {"$ref": "#/$defs/score"},
+        "translation_directions": {"$ref": "#/$defs/count"},
+        "image_directions": {"$ref": "#/$defs/count"},
+        "knowledge_directions": {"$ref": "#/$defs/count"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "records", "ok", "unscorable", "judge_failed"],
+      "properties": {
+        "model": {"type": "string", "minLength": 1},
+        "records": {"$ref": "#/$defs/count"},
+        "ok": {"$ref": "#/$defs/count"},
+        "unscorable": {"$ref": "#/$defs/count"},
+        "judge_failed": {"$ref": "#/$defs/count"},
+        "selected": {"$ref": "#/$defs/count"},
+        "candidate_succeeded": {"$ref": "#/$defs/count"},
+        "candidate_failed": {"$ref": "#/$defs/count"},
+        "judge_ok": {"$ref": "#/$defs/count"},
+        "judge_zero_criteria": {"$ref": "#/$defs/count"}
+      }
+    }
+  }
+}

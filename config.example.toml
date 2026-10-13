@@ -1,0 +1,19 @@
+# The unified `python run_benchmark.py` entry point normally builds this
+# configuration automatically; most users do not need to copy or edit this file.
+# This example is for advanced use of the standalone scripts under `script/`.
+# Candidate and judge may share the same OpenAI-compatible URL, endpoint, and
+# key environment variable while using different model names.
+
+[candidate_api]
+base_url = "https://api.example.com/v1"
+endpoint = "chat/completions"
+model = "your-candidate-model"
+key_env = "VISTA_API_KEY" # Environment variable name, never the secret value.
+timeout_seconds = 120.0
+
+[judge_api]
+base_url = "https://api.example.com/v1"
+endpoint = "chat/completions"
+model = "your-judge-model"
+key_env = "VISTA_API_KEY" # May be shared with candidate_api.
+timeout_seconds = 120.0

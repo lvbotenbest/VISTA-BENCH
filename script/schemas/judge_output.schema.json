@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vista_judge_output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "image_name", "target_lang", "judgments"],
+  "properties": {
+    "schema_version": {"const": "vista_judge_output"},
+    "image_name": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "target_lang": {"type": "string", "minLength": 2, "pattern": "\\S.*\\S"},
+    "judgments": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion_id", "expected_checks", "forbidden_checks", "evidence", "rationale"],
+        "properties": {
+          "criterion_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+          "expected_checks": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["index", "result"],
+              "properties": {
+                "index": {"type": "integer", "minimum": 0},
+                "result": {"enum": ["met", "unmet"]}
+              }
+            }
+          },
+          "forbidden_checks": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["index", "matched"],
+              "properties": {
+                "index": {"type": "integer", "minimum": 0},
+                "matched": {"type": "boolean"}
+              }
+            }
+          },
+          "evidence": {"type": "array", "items": {"type": "string"}},
+          "rationale": {"type": "string", "minLength": 1, "pattern": "\\S"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "judge_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "task_id", "image_name", "source_lang", "target_lang", "profile", "rubric_set", "status", "attempts", "judge_output"],
+      "properties": {
+        "schema_version": {"const": "vista_judge_record"},
+        "task_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "image_name": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "source_lang": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "target_lang": {"type": "string", "minLength": 2, "pattern": "\\S.*\\S"},
+        "profile": {"enum": ["image", "text"]},
+        "rubric_set": {"enum": ["basic_rubric", "rubric"]},
+        "status": {"enum": ["ok", "zero_criteria", "failed"]},
+        "attempts": {"type": "integer", "minimum": 0, "maximum": 3},
+        "judge_output": {"oneOf": [{"type": "null"}, {"$ref": "#"}]},
+        "error": {"type": "string", "minLength": 1, "pattern": "\\S"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "ok"}}},
+          "then": {
+            "properties": {
+              "attempts": {"minimum": 1},
+              "judge_output": {"type": "object", "properties": {"judgments": {"minItems": 1}}}
+            },
+            "not": {"required": ["error"]}
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "zero_criteria"}}},
+          "then": {
+            "properties": {"attempts": {"const": 0}, "judge_output": {"type": "null"}},
+            "not": {"required": ["error"]}
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "failed"}}},
+          "then": {
+            "required": ["error"],
+            "properties": {"attempts": {"minimum": 1}, "judge_output": {"type": "null"}}
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vista_score",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "image_name", "source_lang", "target_lang", "level1", "level1_name_en", "profile", "rubric_set", "scoring_protocol", "status", "dimension_scores", "dimension_scores_100", "criterion_scores"],
+  "properties": {
+    "schema_version": {"const": "vista_score"},
+    "task_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "image_name": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "source_lang": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "target_lang": {"type": "string", "minLength": 2, "pattern": "\\S.*\\S"},
+    "level1": {"type": "string", "minLength": 1},
+    "level1_name_en": {"type": "string", "minLength": 1},
+    "profile": {"enum": ["image", "text"]},
+    "rubric_set": {"enum": ["basic_rubric", "rubric"]},
+    "scoring_protocol": {"const": "binary_expected_independent_vtk"},
+    "status": {"enum": ["ok", "unscorable", "judge_failed"]},
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image_understanding", "translation_quality", "knowledge_entailment"],
+      "properties": {
+        "image_understanding": {"$ref": "#/$defs/unit_score"},
+        "translation_quality": {"$ref": "#/$defs/unit_score"},
+        "knowledge_entailment": {"$ref": "#/$defs/unit_score"}
+      }
+    },
+    "dimension_scores_100": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image_understanding", "translation_quality", "knowledge_entailment"],
+      "properties": {
+        "image_understanding": {"$ref": "#/$defs/percent_score"},
+        "translation_quality": {"$ref": "#/$defs/percent_score"},
+        "knowledge_entailment": {"$ref": "#/$defs/percent_score"}
+      }
+    },
+    "criterion_scores": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/criterion_score"}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "ok"}}},
+      "then": {
+        "properties": {
+          "criterion_scores": {"minItems": 1},
+          "dimension_scores": {"not": {"$ref": "#/$defs/null_dimensions"}},
+          "dimension_scores_100": {"not": {"$ref": "#/$defs/null_dimensions"}}
+        }
+      },
+      "else": {
+        "properties": {
+          "criterion_scores": {"maxItems": 0},
+          "dimension_scores": {"$ref": "#/$defs/null_dimensions"},
+          "dimension_scores_100": {"$ref": "#/$defs/null_dimensions"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"profile": {"const": "text"}}},
+      "then": {
+        "properties": {
+          "dimension_scores": {"properties": {"image_understanding": {"type": "null"}}},
+          "dimension_scores_100": {"properties": {"image_understanding": {"type": "null"}}},
+          "criterion_scores": {"items": {"properties": {"dimension": {"enum": ["translation_quality", "knowledge_entailment"]}}}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "unit_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "percent_score": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "null_dimensions": {
+      "properties": {
+        "image_understanding": {"type": "null"},
+        "translation_quality": {"type": "null"},
+        "knowledge_entailment": {"type": "null"}
+      }
+    },
+    "criterion_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterion_id", "dimension", "importance", "weight", "expected_met", "expected_total", "expected_ratio", "forbidden_triggered", "criterion_score", "rationale"],
+      "properties": {
+        "criterion_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "dimension": {"enum": ["image_understanding", "translation_quality", "knowledge_entailment"]},
+        "importance": {"enum": ["core", "supporting", "minor"]},
+        "weight": {"type": "integer", "enum": [1, 2, 3]},
+        "expected_met": {"type": "integer", "minimum": 0},
+        "expected_total": {"type": "integer", "minimum": 1},
+        "expected_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "forbidden_triggered": {"type": "boolean"},
+        "criterion_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "rationale": {"type": "string", "minLength": 1, "pattern": "\\S"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"importance": {"const": "core"}}},
+          "then": {"properties": {"weight": {"const": 3}}}
+        },
+        {
+          "if": {"properties": {"importance": {"const": "supporting"}}},
+          "then": {"properties": {"weight": {"const": 2}}}
+        },
+        {
+          "if": {"properties": {"importance": {"const": "minor"}}},
+          "then": {"properties": {"weight": {"const": 1}}}
+        },
+        {
+          "if": {"properties": {"forbidden_triggered": {"const": true}}},
+          "then": {"properties": {"criterion_score": {"const": 0}}}
+        },
+        {
+          "if": {"properties": {"expected_met": {"const": 0}}},
+          "then": {"properties": {"expected_ratio": {"const": 0}, "criterion_score": {"const": 0}}}
+        }
+      ]
+    }
+  }
+}

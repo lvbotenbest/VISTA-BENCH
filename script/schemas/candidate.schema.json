@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vista_self_segmented_candidate_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "image_name", "source_lang", "target_lang", "candidate_blocks"],
+  "properties": {
+    "schema_version": {"const": "vista_self_segmented_candidate_v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "image_name": {"type": "string", "minLength": 1},
+    "source_lang": {"type": "string", "minLength": 1},
+    "target_lang": {"type": "string", "minLength": 2},
+    "candidate_blocks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "source_text", "text"], "properties": {"id": {"type": "integer", "minimum": 1}, "source_text": {"type": "string"}, "text": {"type": "string"}}}}
+  }
+}

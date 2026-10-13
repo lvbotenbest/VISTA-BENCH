@@ -1,0 +1,1 @@
+Translate every visible text segment in the supplied image into target language {target_lang}. Return one JSON object only, with key candidate_blocks. candidate_blocks must be an array of objects with integer id, string source_text, and string text. Use the source segment hints below only to align visible content. Do not add commentary.\n\nSource segment hints:\n{source_blocks}\n
