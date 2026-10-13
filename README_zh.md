@@ -71,17 +71,15 @@ hf download lvpokoto/VISTA-Bench \
   --local-dir .
 ```
 
-### 1. 无参数交互运行
+### 运行评测
 
-统一入口会询问 track、rubric、API、模型、目标语言、任务上限和输出目录；密钥使用隐藏输入，不写入仓库。
+最简单的方式是使用交互式入口。程序会依次询问 API 地址、模型、评测 track、rubric、目标语言和输出目录；交互输入的 API Key 会隐藏显示，也不会写入仓库。
 
 ```bash
 python run_benchmark.py
 ```
 
-### 2. 三任务 smoke run
-
-先把密钥放入环境变量，再运行 3 个任务。`--target-lang` 使用数据中的语言代码；例如简体中文为 `zh-Hans`。
+如果希望命令可复现，可先把 API Key 放入环境变量，并用 `--limit 3` 运行少量任务确认配置和完整流程：
 
 ```bash
 export VISTA_API_KEY='your-secret-value'
@@ -97,35 +95,10 @@ python run_benchmark.py \
   --rubric-set rubric \
   --target-lang zh-Hans \
   --limit 3 \
-  --output-dir outputs/smoke \
-  --candidate-workers 2 \
-  --judge-workers 2
+  --output-dir outputs/my-run
 ```
 
-可在发出请求前用同一命令追加 `--dry-run`，检查任务选择和运行计划。
-
-### 3. 完整 CLI
-
-下面展示统一入口的全部常用控制项。删除 `--limit` 即评测全部匹配任务；重复 `--target-lang` 可选择多个目标语言。
-
-```bash
-python run_benchmark.py \
-  --non-interactive \
-  --api-url https://api.example.com/v1 \
-  --key-env VISTA_API_KEY \
-  --candidate-model your-candidate-model \
-  --judge-model your-judge-model \
-  --endpoint responses \
-  --track image \
-  --rubric-set rubric \
-  --target-lang zh-Hans \
-  --target-lang es \
-  --output-dir outputs/full-image-rubric \
-  --candidate-workers 8 \
-  --judge-workers 8 \
-  --max-attempts 3 \
-  --timeout-seconds 120
-```
+确认流程正常后，删除 `--limit 3` 即可运行全部匹配任务；重复 `--target-lang` 可以选择多个目标语言。追加 `--dry-run` 可以只查看任务选择，不发送 API 请求。
 
 ## 统一入口参数
 

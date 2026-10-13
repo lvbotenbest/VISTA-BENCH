@@ -71,17 +71,15 @@ hf download lvpokoto/VISTA-Bench \
   --local-dir .
 ```
 
-### 1. Interactive run with no arguments
+### Run the benchmark
 
-The unified entry point asks for the track, rubric, API, models, target languages, task limit, and output directory. A directly entered key uses hidden input and is not written to the repository.
+The easiest option is the interactive launcher. It asks for the API endpoint, models, evaluation track, rubric, target languages, and output directory. API keys entered interactively are hidden and are not written to the repository.
 
 ```bash
 python run_benchmark.py
 ```
 
-### 2. Three-task smoke run
-
-Store the key in an environment variable, then run three tasks. `--target-lang` uses the language codes in the dataset; Simplified Chinese is `zh-Hans`.
+For a reproducible command-line run, store the API key in an environment variable and start with a small three-task check:
 
 ```bash
 export VISTA_API_KEY='your-secret-value'
@@ -97,35 +95,10 @@ python run_benchmark.py \
   --rubric-set rubric \
   --target-lang zh-Hans \
   --limit 3 \
-  --output-dir outputs/smoke \
-  --candidate-workers 2 \
-  --judge-workers 2
+  --output-dir outputs/my-run
 ```
 
-Append `--dry-run` to the same command to inspect task selection and the execution plan before sending requests.
-
-### 3. Full CLI
-
-The following example shows all common controls. Remove `--limit` to evaluate every matching task. Repeat `--target-lang` to select multiple targets.
-
-```bash
-python run_benchmark.py \
-  --non-interactive \
-  --api-url https://api.example.com/v1 \
-  --key-env VISTA_API_KEY \
-  --candidate-model your-candidate-model \
-  --judge-model your-judge-model \
-  --endpoint responses \
-  --track image \
-  --rubric-set rubric \
-  --target-lang zh-Hans \
-  --target-lang es \
-  --output-dir outputs/full-image-rubric \
-  --candidate-workers 8 \
-  --judge-workers 8 \
-  --max-attempts 3 \
-  --timeout-seconds 120
-```
+After the pipeline completes successfully, remove `--limit 3` to evaluate all matching tasks. Repeat `--target-lang` to select multiple targets. Add `--dry-run` to inspect the selected tasks without sending API requests.
 
 ## Unified entry-point options
 
