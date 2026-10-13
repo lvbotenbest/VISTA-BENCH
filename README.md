@@ -5,9 +5,9 @@ A multilingual benchmark for evaluating translation from real-world images and r
 面向真实世界图像与公开 OCR 的多语言翻译评测基准。
 
 <p align="center">
-  <a href="https://github.com/lvbotenbest/VISTA-BENCH">GitHub Code</a> ·
-  <a href="https://huggingface.co/datasets/lvpokoto/VISTA-Bench">🤗 Hugging Face Dataset</a> ·
-  <a href="https://arxiv.org/abs/2609.37287">Paper</a>
+  <a href="https://github.com/lvbotenbest/VISTA-BENCH"><img src="https://img.shields.io/badge/GitHub-Code-181717?logo=github&logoColor=white" alt="GitHub Code"></a>
+  <a href="https://huggingface.co/datasets/lvpokoto/VISTA-Bench"><img src="https://img.shields.io/badge/🤗%20Hugging%20Face-Dataset-FFD21E" alt="Hugging Face Dataset"></a>
+  <a href="https://arxiv.org/abs/2609.37287"><img src="https://img.shields.io/badge/arXiv-Paper-B31B1B?logo=arxiv&logoColor=white" alt="Paper"></a>
 </p>
 
 <p align="center">
@@ -26,12 +26,17 @@ A multilingual benchmark for evaluating translation from real-world images and r
 
 <p align="center"><sub>Paper Table 1. Overall denotes global translation quality (T), not a composite of V, T, and K.</sub></p>
 
-<details open>
-<summary><strong>中文（默认展开）</strong></summary>
+<p align="center"><strong>选择语言 / Choose a language</strong></p>
+
+<details>
+<summary><strong>🇨🇳 中文</strong></summary>
 
 ## 概览
 
-VISTA-Bench 覆盖 23 种源语言与 10 类日常场景。每张图像配有 OCR、人工核验翻译，以及两套评测规则：面向强模型、保留较难规则的 `rubric`，以及面向小模型、规则本身更简单的 `basic_rubric`。候选模型生成翻译后，由**只接收文本的 judge**按目标语言 rubric 检查，最后使用确定性的 `scoring` 计分并汇总。我们将持续更新数据集，进一步丰富图片数量、覆盖语种与应用场景。
+VISTA-Bench 覆盖 23 种源语言与 10 类日常场景。每张图像配有 OCR、人工核验翻译，以及两套评测规则：面向强模型、保留较难规则的 `rubric`，以及面向小模型、规则本身更简单的 `basic_rubric`。候选模型生成翻译后，由**只接收文本的 judge**按目标语言 rubric 检查，最后使用确定性的 `scoring` 计分并汇总。
+
+> [!IMPORTANT]
+> 🚀 **我们将持续更新数据集，进一步丰富图片数量、覆盖语种与应用场景。**
 
 ## Quick Start
 
@@ -254,11 +259,14 @@ Text track 将第一条命令换成 `script/generate_text_candidates.py`，并�
 </details>
 
 <details>
-<summary><strong>English</strong></summary>
+<summary><strong>🇬🇧 English</strong></summary>
 
 ## Overview
 
-VISTA-Bench covers 23 source languages and 10 everyday-use domains. Each image is paired with OCR, verified translations, and two evaluation rule sets: `rubric`, which retains harder criteria for stronger models, and `basic_rubric`, whose criteria are intentionally easier for smaller models. A candidate model produces a translation, a **text-only judge** evaluates it against the target-language rubric, and deterministic `scoring` produces task scores and aggregates. We will continue updating the dataset with more images, languages, and application scenarios.
+VISTA-Bench covers 23 source languages and 10 everyday-use domains. Each image is paired with OCR, verified translations, and two evaluation rule sets: `rubric`, which retains harder criteria for stronger models, and `basic_rubric`, whose criteria are intentionally easier for smaller models. A candidate model produces a translation, a **text-only judge** evaluates it against the target-language rubric, and deterministic `scoring` produces task scores and aggregates.
+
+> [!IMPORTANT]
+> 🚀 **We will continue updating the dataset with more images, languages, and application scenarios.**
 
 ## Quick Start
 
